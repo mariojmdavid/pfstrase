@@ -4,7 +4,7 @@ As the name suggests PFSTRASE (Parallel FileSystem TRacing and Analysis SErvice)
 
 ## Installation
 ### 1. Server setup
-The pfstrase server collects usage data from clients (OSSs and MDSs) and makes it available to the monitoring viewer pfstop and sends it to the database.
+The pfstrase server aggregates usage data from clients (OSSs and MDSs) and makes it available to the monitoring viewer pfstop and optionally sends it to a backend database.
 Build and install pfstrase_server RPM:
 ```
 git clone https://github.com/TACC/pfstrase.git 
@@ -16,11 +16,11 @@ mkdir -p ~/rpmbuild/SPECS
 cp pfstrase_server.spec ~/rpmbuild/SPECS
 cp *.tar.gz ~/rpmbuild/SOURCES
 rpmbuild -bb ~/rpmbuild/SPECS/pfstrase_server.spec
-rpm -i ~/rpmbuild/RPMS/pfstrase_server.rpm
+rpm -i ~/rpmbuild/RPMS/pfstrase_server-1.0.0.rpm
 ```
-Edit `pfstrase_server.conf` with aprsopriate values and start the server (remove the `-d` argument for troubleshooting):
+Edit `/etc/pfstrase/pfstrase_server.conf` with appropriate values and start the server (remove the `-d` argument for troubleshooting):
 ```
-pfstrase_server -c pfstrase_server.conf  -d
+systemctl start pfstrase_server
 ```
 In order to map the Lustre client names extracted from the servers to something more readable, create a mapping file and import this into the server. Currently this must be done everytime the server is restarted.
 ```
@@ -31,8 +31,15 @@ LustreNodeID  FQDN  hostname
 
 map_nids.py [pfstrase_server] [nid_filename]
 ```
+The nids directory can be examined for example mapping files. This step must be done every time the server is restarted.
 In order to import current job data from SLURM either run the script `qhost.py` periodically (crontab) or add as a SLURM prolog script.
 
+Run the 
+```
+pfstop
+```
+command to view the data in an top-like interface. It will filter the data to the user running it unless they are root or part of an administrative group
+currently set in line 74 of server/screen.c (this will be configurable in the future using the conf file).
 ### 2. Client setup
 The client daemon collects usage data and sends it to the server via JSON reports at the specified polling rate.
 Build and install pfstrased RPM:
@@ -47,17 +54,25 @@ cp  pfstrase.spec ~/rpmbuild/SPECS
 
 rpmbuild -bb ~/rpmbuild/SPECS/pfstrase.spec 
 
-rpm -i ~/rpmbuild/RPMS/pfstrase_server.rpm
+rpm -i ~/rpmbuild/RPMS/pfstrased-1.0.0.rpm
 ```
 Deployment:
 Copy the client RPM to the OSSs and MDSs to be monitored, install and start the pfstrase service
-An Ansible playbook is available to implement this:
+```
+systemctl start pfstrase
+```
+
+An Ansible playbook is available as an example:
 ```
 ansible-playbook ../deploy/install_pfstrase.yaml
 ```
 
 ## Copyright
 (C) 2018 University of Texas at Austin
+
+This material is based upon work supported by the National Science Foundation under Grant Number 1835135.
+
+Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
 
 ## License
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
