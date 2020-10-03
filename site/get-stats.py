@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys, os, json
-from datetime import datetime, timezone
+from datetime import datetime
 import pika 
 
 
@@ -18,8 +18,7 @@ def ingest(channel, method_frame, header_frame, body):
         print(sys.exc_info()[0])
         return
 
-    time = datetime.fromtimestamp(data_json["tags"].pop("time"),
-                                  tz = timezone.utc)
+    time = datetime.utcfromtimestamp(data_json["tags"].pop("time"))
     tags = data_json["tags"]
     tags["time"]  = time
     data = data_json["data"]
