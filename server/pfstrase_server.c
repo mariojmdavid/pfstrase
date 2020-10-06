@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
   ev_timer_start(EV_DEFAULT, &shm_timer);
   
   #ifdef PSQL
-  if (pq_connect(dbserver, dbname, dbuser) < 0)
+  if (pq_connect(dbserver, dbname, dbuser, dbpass) < 0)
     goto out;
   ev_timer_init(&pq_timer, pq_timer_cb, 0.0, db_interval);   
   ev_timer_start(EV_DEFAULT, &pq_timer);
