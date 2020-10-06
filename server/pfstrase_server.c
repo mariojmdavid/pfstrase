@@ -20,6 +20,7 @@ static FILE *log_stream = NULL;
 static char *dbserver = NULL;
 static char *dbname = NULL;
 static char *dbuser = NULL;
+static char *dbpass = NULL;
 
 static char *port = "5672";
 
