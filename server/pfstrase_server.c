@@ -82,6 +82,12 @@ int read_conf_file()
       fprintf(log_stream, "%s: Setting database user to %s based on file %s\n",
 	      app_name, dbuser, conf_file_name);
     }
+    if (strcmp(key, "dbpass") == 0) {  
+      line[strlen(line) - 1] = '\0';
+      dbpass = strdup(line);
+      fprintf(log_stream, "%s: Setting database password file %s\n",
+	      app_name, conf_file_name);
+    }
     if (strcmp(key, "db_interval") == 0) {  
       if (sscanf(line, "%lf", &db_interval) == 1)
 	fprintf(log_stream, "%s: Setting database update interval to %f based on file %s\n",

@@ -2,11 +2,11 @@
 #include "stats.h"
 #include <string.h>
 
-int pq_connect(char *pq_server, char *dbname, char *dbuser) {
+int pq_connect(char *pq_server, char *dbname, char *dbuser, char *dbpass) {
   int rc = -1;
   
   char conninfo[256];
-  snprintf(conninfo, sizeof(conninfo), "dbname=%s user=%s host=%s", dbname, dbuser, pq_server);
+  snprintf(conninfo, sizeof(conninfo), "dbname=%s user=%s host=%s password=%s", dbname, dbuser, pq_server, dbpass);
   conn = PQconnectdb(conninfo);
   /* Check to see that the backend connection was successfully made */
   if (PQstatus(conn) != CONNECTION_OK) {
