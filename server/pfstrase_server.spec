@@ -19,7 +19,7 @@ along with a systemd script to provide control.
 %setup
 
 %build
-./configure
+./configure --enable-psql LDFLAGS=-L/usr/pgsql-9.6/lib CFLAGS=-I/usr/pgsql-9.6/include
 make
 sed -i 's/CONFIGFILE/\%{_sysconfdir}\/pfstrase\/pfstrase_server.conf/' pfstrase_server.service
 
